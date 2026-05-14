@@ -16,7 +16,7 @@ Estructura mínima para crear un agente en **Python** usando el **SDK de Claude 
 
 ## Instalación
 
-Requiere **Python 3.10+**.
+Requiere **Python 3.8+**.
 
 ```bash
 python -m venv .venv

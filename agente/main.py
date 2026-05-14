@@ -1,5 +1,6 @@
 import os
 import sys
+from typing import Optional
 
 try:
     from anthropic import Anthropic
@@ -8,7 +9,7 @@ except ImportError:  # pragma: no cover - depende del entorno local
 
 
 class ClaudeAgent:
-    def __init__(self, api_key: str | None = None, model: str | None = None) -> None:
+    def __init__(self, api_key: Optional[str] = None, model: Optional[str] = None) -> None:
         self.api_key = api_key or os.getenv("ANTHROPIC_API_KEY")
         self.model = model or os.getenv("CLAUDE_MODEL", "claude-3-5-sonnet-latest")
         self._client = None
