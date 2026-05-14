@@ -24,12 +24,20 @@ class ClaudeAgent:
         if self._client is None:
             self._client = Anthropic(api_key=self.api_key)
 
-        response = self._client.messages.create(
-            model=self.model,
-            max_tokens=max_tokens,
-            messages=[{"role": "user", "content": prompt}],
-        )
-        text = "".join(getattr(block, "text", "") for block in response.content).strip()
+        try:
+            response = self._client.messages.create(
+                model=self.model,
+                max_tokens=max_tokens,
+                messages=[{"role": "user", "content": prompt}],
+            )
+        except Exception as exc:  # pragma: no cover - depende de la API externa
+            raise RuntimeError(f"Error al consultar Claude: {exc}") from exc
+
+        text = "".join(
+            getattr(block, "text", "")
+            for block in response.content
+            if getattr(block, "type", "") == "text"
+        ).strip()
         if not text:
             raise RuntimeError("Claude devolvió una respuesta sin contenido de texto")
         return text
