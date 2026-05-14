@@ -11,6 +11,7 @@ class ClaudeAgent:
     def __init__(self, api_key: str | None = None, model: str | None = None) -> None:
         self.api_key = api_key or os.getenv("ANTHROPIC_API_KEY")
         self.model = model or os.getenv("CLAUDE_MODEL", "claude-3-5-sonnet-latest")
+        self._client = None
 
     def ask(self, prompt: str, max_tokens: int = 512) -> str:
         if not prompt.strip():
@@ -20,13 +21,18 @@ class ClaudeAgent:
         if not self.api_key:
             raise RuntimeError("Falta ANTHROPIC_API_KEY en variables de entorno")
 
-        client = Anthropic(api_key=self.api_key)
-        response = client.messages.create(
+        if self._client is None:
+            self._client = Anthropic(api_key=self.api_key)
+
+        response = self._client.messages.create(
             model=self.model,
             max_tokens=max_tokens,
             messages=[{"role": "user", "content": prompt}],
         )
-        return "".join(block.text for block in response.content if hasattr(block, "text")).strip()
+        text = "".join(block.text for block in response.content if hasattr(block, "text")).strip()
+        if not text:
+            raise RuntimeError("Claude devolvió una respuesta sin contenido de texto")
+        return text
 
 
 def main() -> int:
