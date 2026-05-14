@@ -29,7 +29,7 @@ class ClaudeAgent:
             max_tokens=max_tokens,
             messages=[{"role": "user", "content": prompt}],
         )
-        text = "".join(block.text for block in response.content if hasattr(block, "text")).strip()
+        text = "".join(getattr(block, "text", "") for block in response.content).strip()
         if not text:
             raise RuntimeError("Claude devolvió una respuesta sin contenido de texto")
         return text
